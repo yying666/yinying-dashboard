@@ -6,6 +6,60 @@
    	 if (error) alert(error.message); // alert if error
     }
 
+	function setTimeslot(day, index, name, period, style){
+		if (day === "Monday") {
+  			timetable.Monday[index].name = newName;
+  			timetable.Monday[index].period = newPeriod;
+  			timetable.Monday[index].style = newStyle;
+		}
+		else if (day === "Tuesday") {
+  			timetable.Tuesday[index].name = newName;
+  			timetable.Tuesday[index].period = newPeriod;
+  			timetable.Tuesday[index].style = newStyle;
+		}
+		else if (day === "Wednesday") {
+  			timetable.Wednesday[index].name = newName;
+  			timetable.Wednesday[index].period = newPeriod;
+  			timetable.Wednesday[index].style = newStyle;
+		}
+		else if (day === "Thursday") {
+  			timetable.Thursday[index].name = newName;
+  			timetable.Thursday[index].period = newPeriod;
+  			timetable.Thursday[index].style = newStyle;
+		}
+		else {
+  			timetable.Friday[index].name = newName;
+  			timetable.Friday[index].period = newPeriod;
+  			timetable.Friday[index].style = newStyle;
+		}
+
+	}
+
+	function deleteTimeSlot(day,index) {
+		if (day === "Monday") {
+  			timetable.Monday.splice(index, 1);
+  			timetable = timetable;
+		}
+		else if (day === "Tuesday") {
+  			timetable.Tuesday.splice(index, 1);
+  			timetable = timetable;
+		}
+		else if (day === "Wednesday") {
+  			timetable.Wednesday.splice(index, 1);
+  			timetable = timetable;
+		}
+		else if (day === "Thursday") {
+  			timetable.Thursday.splice(index, 1);
+  			timetable = timetable;
+		}
+		else {
+  			timetable.Friday.splice(index, 1);
+  			timetable = timetable;
+		}
+
+	}
+
+
     let timetable = {
 	Monday: [
   	{
@@ -379,6 +433,7 @@ function showCurData(day, index, name, period, style){
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+		<button type="button" class="btn btn-danger"	data-bs-dismiss="modal" on:click={() => deleteTimeSlot(curDay, curIndex)}>Delete</button>
         <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
