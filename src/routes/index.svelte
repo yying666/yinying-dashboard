@@ -1,4 +1,5 @@
 <script>
+	import supabase from "$lib/db";
 
     async function signOut() {
    	 const { error } = await supabase.auth.signOut();
@@ -6,61 +7,18 @@
    	 if (error) alert(error.message); // alert if error
     }
 
-	function setTimeslot(day, index, name, period, style){
-		if (day === "Monday") {
-  			timetable.Monday[index].name = newName;
-  			timetable.Monday[index].period = newPeriod;
-  			timetable.Monday[index].style = newStyle;
-		}
-		else if (day === "Tuesday") {
-  			timetable.Tuesday[index].name = newName;
-  			timetable.Tuesday[index].period = newPeriod;
-  			timetable.Tuesday[index].style = newStyle;
-		}
-		else if (day === "Wednesday") {
-  			timetable.Wednesday[index].name = newName;
-  			timetable.Wednesday[index].period = newPeriod;
-  			timetable.Wednesday[index].style = newStyle;
-		}
-		else if (day === "Thursday") {
-  			timetable.Thursday[index].name = newName;
-  			timetable.Thursday[index].period = newPeriod;
-  			timetable.Thursday[index].style = newStyle;
-		}
-		else {
-  			timetable.Friday[index].name = newName;
-  			timetable.Friday[index].period = newPeriod;
-  			timetable.Friday[index].style = newStyle;
-		}
+	async function getEntries() {
+		const { data, error } = await supabase.from("studentEntries").select();
+		if (error) alert(error.message);
 
+		if (data != "") {
+			timetable = data[0].timetable;
+		}
 	}
 
-	function deleteTimeSlot(day,index) {
-		if (day === "Monday") {
-  			timetable.Monday.splice(index, 1);
-  			timetable = timetable;
-		}
-		else if (day === "Tuesday") {
-  			timetable.Tuesday.splice(index, 1);
-  			timetable = timetable;
-		}
-		else if (day === "Wednesday") {
-  			timetable.Wednesday.splice(index, 1);
-  			timetable = timetable;
-		}
-		else if (day === "Thursday") {
-  			timetable.Thursday.splice(index, 1);
-  			timetable = timetable;
-		}
-		else {
-  			timetable.Friday.splice(index, 1);
-  			timetable = timetable;
-		}
-
-	}
-
-
-    let timetable = {
+	getEntries();
+	
+	 let timetable = {
 	Monday: [
   	{
     	name: "PH",
@@ -233,6 +191,89 @@
 	],
   };
 
+      
+let curDay;
+let	curIndex;
+let curName;
+let	curPeriod;
+let	curStyle;
+
+function showCurData(day, index, name, period, style){
+	curDay=day;
+	curIndex=index;
+	curName=name;
+	curPeriod=period;
+	curStyle=style;
+}
+
+	function setTimeslot(day, index, newName, newPeriod, newStyle){
+		if (day === "Monday") {
+  			timetable.Monday[index].name = newName;
+  			timetable.Monday[index].period = newPeriod;
+  			timetable.Monday[index].style = newStyle;
+		}
+		else if (day === "Tuesday") {
+  			timetable.Tuesday[index].name = newName;
+  			timetable.Tuesday[index].period = newPeriod;
+  			timetable.Tuesday[index].style = newStyle;
+		}
+		else if (day === "Wednesday") {
+  			timetable.Wednesday[index].name = newName;
+  			timetable.Wednesday[index].period = newPeriod;
+  			timetable.Wednesday[index].style = newStyle;
+		}
+		else if (day === "Thursday") {
+  			timetable.Thursday[index].name = newName;
+  			timetable.Thursday[index].period = newPeriod;
+  			timetable.Thursday[index].style = newStyle;
+		}
+		else {
+  			timetable.Friday[index].name = newName;
+  			timetable.Friday[index].period = newPeriod;
+  			timetable.Friday[index].style = newStyle;
+		}
+		saveEntry();
+	}
+
+	async function saveEntry() {
+		const { error } = await supabase.from("studentEntries").upsert(
+				{
+				user_id: supabase.auth.user().id,
+				timetable: timetable,
+				},
+			{onConflict: "user_id" }
+		);
+	if (error) alert(error.message);
+	}
+
+
+	function deleteTimeSlot(day,index) {
+		if (day === "Monday") {
+  			timetable.Monday.splice(index, 1);
+  			timetable = timetable;
+		}
+		else if (day === "Tuesday") {
+  			timetable.Tuesday.splice(index, 1);
+  			timetable = timetable;
+		}
+		else if (day === "Wednesday") {
+  			timetable.Wednesday.splice(index, 1);
+  			timetable = timetable;
+		}
+		else if (day === "Thursday") {
+  			timetable.Thursday.splice(index, 1);
+  			timetable = timetable;
+		}
+		else {
+  			timetable.Friday.splice(index, 1);
+  			timetable = timetable;
+		}
+		saveEntry();
+	}
+
+
+   
+
 function addTimeSlot(day){
 	if (day=="Monday"){
 		 timetable.Monday = [
@@ -265,20 +306,7 @@ function addTimeSlot(day){
 			];
 	}
 }
-    
-let curDay;
-let	curIndex;
-let curName;
-let	curPeriod;
-let	curStyle;
 
-function showCurData(day, index, name, period, style){
-	curDay=day;
-	curIndex=index;
-	curName=name;
-	curPeriod=period;
-	curStyle=style;
-}
       
 </script>
 <h1>My dashboard</h1>
@@ -434,7 +462,9 @@ function showCurData(day, index, name, period, style){
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 		<button type="button" class="btn btn-danger"	data-bs-dismiss="modal" on:click={() => deleteTimeSlot(curDay, curIndex)}>Delete</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-primary" on:click=
+		{
+		()=>{setTimeslot(curDay,curIndex,curName,curPeriod,curStyle)}} >Save changes</button>
       </div>
     </div>
   </div>
