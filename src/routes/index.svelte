@@ -190,8 +190,7 @@
   	},
 	],
   };
-
-      
+   
 let curDay;
 let	curIndex;
 let curName;
